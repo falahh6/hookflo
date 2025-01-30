@@ -1,6 +1,9 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import useSWR from "swr";
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
 
 export default function WebhookPage() {
   const pathname = usePathname();
@@ -15,8 +18,13 @@ export default function WebhookPage() {
   console.log("data", data);
 
   return (
-    <div>
+    <div className="p-10">
       {isLoading && <p>Loading...</p>}
+      <Button variant={"link"}>
+        <Link href={"/"}>
+          <ChevronLeft className="h-4 w-4" /> BACK
+        </Link>
+      </Button>
       <h1>Webhook URL: {wId}</h1>
       <div className="m-10">
         {data?.length > 0 &&

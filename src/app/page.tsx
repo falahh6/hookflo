@@ -14,11 +14,11 @@ export default function Home() {
   const router = useRouter();
 
   const createEndpointHandler = async () => {
-    const response = await fetch("/api/endpoints/create", {
+    const response = await fetch("/api/endpoints", {
       method: "POST",
-      body: JSON.stringify({ userId }),
       headers: {
         "Content-Type": "application/json",
+        Authorization: `User ${userId}`,
       },
     });
 
@@ -27,12 +27,31 @@ export default function Home() {
   };
 
   const getUserEndpoints = async () => {
-    const response = await fetch(`/api/endpoints?user_id=${userId}`);
+    const response = await fetch(`/api/endpoints`, {
+      headers: {
+        Authorization: `User ${userId}`,
+      },
+    });
 
     if (response.ok) {
       const data = await response.json();
       console.log("data", data);
       setEndpoints(data);
+    } else {
+      console.log("error", response.statusText);
+    }
+  };
+
+  const deleteEndpointHandler = async (id: string) => {
+    const response = await fetch(`/api/endpoints?id=${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `User ${userId}`,
+      },
+    });
+
+    if (response.ok) {
+      getUserEndpoints();
     } else {
       console.log("error", response.statusText);
     }
@@ -55,14 +74,26 @@ export default function Home() {
           className="flex items-center gap-4 my-2 bg-gray-50 p-2 border"
         >
           <p>{endpoint.id}</p>
+          <p>
+            <Link
+              href={`/wh/${endpoint.id}`}
+            >{`${process.env.NEXT_PUBLIC_SITE_URL}/wh/${endpoint.id}`}</Link>
+          </p>
           <p>{endpoint.expires_at}</p>
           <Button variant={"link"} size={"sm"} asChild>
             <Link href={`/wh/${endpoint.id}`}>View</Link>
           </Button>
+          <Button
+            variant={"link"}
+            className="text-red-400"
+            size={"sm"}
+            onClick={() => deleteEndpointHandler(endpoint.id)}
+          >
+            Delete
+          </Button>
         </div>
       ))}
       <div className="mt-6 w-[50%] flex flex-col gap-4">
-        {/* <Input type="text" placeholder="Create the url" /> */}
         <Button onClick={createEndpointHandler} className="w-fit">
           Create
         </Button>
